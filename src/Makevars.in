@@ -1,0 +1,51 @@
+#################################################################
+
+PKG_CXXFLAGS = -I../inst/include/ 
+PKG_LIBS = @RTH_LDFLAGS@
+
+PKG_CPPFLAGS = @RTH_CPPFLAGS@   # -Wfatal-errors
+
+#	rthcolsums.o \
+#	rthgini.o \
+#	rthhist.o \
+#	rthkendall.o \
+#	rthma.o \
+#	rthrnorm.o \
+#	rthrunif.o \
+
+R_OBJS = \
+	hash.o \
+	rthdist.o \
+	rthmean.o \
+	rthnorm.o \
+	rthorder.o \
+	rthpdist.o \
+	rthpearson.o \
+	rthsort.o \
+	rthtable.o \
+	rthxpos.o \
+	threads.o
+
+
+OBJECTS = $(R_OBJS)
+
+BACKEND = @BACKEND@
+all: $(SHLIB)
+
+ifeq "$(BACKEND)" "CUDA"
+NVCC = @NVCC@
+CUDA_INCS = @CUDA_INCS@
+
+%.o: %.cpp
+	$(NVCC) -DGPU -x cu -c -Xcompiler "-fPIC" $(CUDA_INCS) $< -o $@
+Rth.so: $(OBJECTS)
+	$(NVCC) --shared $(OBJECTS) -o $@
+else
+$(SHLIB): $(OBJECTS)
+endif
+
+
+clean:
+	@rm -rf *.o *.so *.dll \
+		Makevars $(USER_CONF) $(SHLIB) $(OBJECTS)
+
