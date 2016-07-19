@@ -15,7 +15,7 @@ ByteCompile: yes
 Authors@R: c(person("Norm", "Matloff", role = c("aut", "cre"),
     email = "nsmatloff@ucdavis.edu"),
     person("Drew", "Schmidt", role = "aut",
-    email = "wrathematics@gmail.com")
+    email = "wrathematics@gmail.com"),
     person("Matsumoto", "Maxwell", role = "aut",
     email = "mmmatsumoto@ucdavis.edu")
     )
