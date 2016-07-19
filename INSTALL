@@ -1,12 +1,15 @@
 # Rth Installation
 
-Below, the installation directory is ~/R; change as desired.
+Below, the installation directory is ~/R; change as desired.  
+
+Download the package to a directory Rth (can delete after installation),
+so that for example the R code is now in Rth/R.  Then do one of the following, according to the desired backend.
 
 ## OpenMP
 
 Assuming you have an OpenMP-compatible C++ compiler (on a Mac, install the OpenMP-compatible version of clang):
 
-    R CMD INSTALL -l ~/R Rth_0.1-0.tar.gz \
+    R CMD INSTALL -l ~/R Rth \
       --configure-args="--with-backend=OPENMP"
 
 
@@ -14,7 +17,7 @@ Assuming you have an OpenMP-compatible C++ compiler (on a Mac, install the OpenM
 ## Intel Thread Building Blocks
 
 
-    R CMD INSTALL -l ~/R Rth_0.1-0.tar.gz \
+    R CMD INSTALL -l ~/R Rth \
       --configure-args="--with-backend=TBB \
       --with-tbb-incdir=$TBBINC --with-tbb-libdir=$TBBLIB"
 
@@ -22,5 +25,5 @@ Assuming you have an OpenMP-compatible C++ compiler (on a Mac, install the OpenM
 
 ## CUDA
 
-    R CMD INSTALL -l ~/R Rth_0.1-0.tar.gz \
+    R CMD INSTALL -l ~/R Rth \
       --configure-args="--with-backend=CUDA"
