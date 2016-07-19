@@ -1,13 +1,12 @@
 # Rth Installation
 
-
+Below, the installation directory is ~/R; change as desired.
 
 ## OpenMP
 
-Assuming you have an OpenMP-compatible C++ compiler (generally not
-available on the Mac):
+Assuming you have an OpenMP-compatible C++ compiler (on a Mac, install the OpenMP-compatible version of clang):
 
-    R CMD INSTALL Rth_0.1-0.tar.gz \
+    R CMD INSTALL -l ~/R Rth_0.1-0.tar.gz \
       --configure-args="--with-backend=OPENMP"
 
 
@@ -15,7 +14,7 @@ available on the Mac):
 ## Intel Thread Building Blocks
 
 
-    R CMD INSTALL Rth_0.1-0.tar.gz \
+    R CMD INSTALL -l ~/R Rth_0.1-0.tar.gz \
       --configure-args="--with-backend=TBB \
       --with-tbb-incdir=$TBBINC --with-tbb-libdir=$TBBLIB"
 
@@ -23,5 +22,5 @@ available on the Mac):
 
 ## CUDA
 
-    R CMD INSTALL Rth_0.1-0.tar.gz \
+    R CMD INSTALL -l ~/R Rth_0.1-0.tar.gz \
       --configure-args="--with-backend=CUDA"
