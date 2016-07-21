@@ -4,16 +4,6 @@ Below, the installation directory is ~/R; change as desired.
 
 Download the package to a directory Rth (can delete after installation), so that for example the R code is now in Rth/R.  
 
-Change directory to Rth, and run one of the following, depending on desired backend:
-
-./configure --with-backend=TBB --with-tbb-incdir=$TBBINC --with-tbb-libdir=$TBBLIB
-
-./configure --with-backend=OPENMP
-
-./configure --with-backend=CUDA
-
-Then change back up to the directory
-
 Then do one of the following, according to the desired backend.
 
 ## OpenMP
