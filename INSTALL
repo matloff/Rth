@@ -2,28 +2,44 @@
 
 Below, the installation directory is ~/R; change as desired.  
 
-Download the package to a directory Rth (can delete after installation),
-so that for example the R code is now in Rth/R.  Then do one of the following, according to the desired backend.
+Download the package to a directory Rth (can delete after installation), so that for example the R code is now in Rth/R.  
+
+Change directory to Rth, and run one of the following, depending on desired backend:
+
+./configure --with-backend=TBB --with-tbb-incdir=$TBBINC --with-tbb-libdir=$TBBLIB
+
+./configure --with-backend=OPENMP
+
+./configure --with-backend=CUDA
+
+Then change back up to the directory
+
+Then do one of the following, according to the desired backend.
 
 ## OpenMP
 
 Assuming you have an OpenMP-compatible C++ compiler (on a Mac, install the OpenMP-compatible version of clang):
 
-    R CMD INSTALL -l ~/R Rth \
-      --configure-args="--with-backend=OPENMP"
 
-
+    cd Rth
+    ./configure --with-backend=OPENMP
+    cd ..
+    R CMD INSTALL -l ~/R Rth
 
 ## Intel Thread Building Blocks
 
 
-    R CMD INSTALL -l ~/R Rth \
-      --configure-args="--with-backend=TBB \
-      --with-tbb-incdir=$TBBINC --with-tbb-libdir=$TBBLIB"
+    cd Rth
+    ./configure --with-backend=TBB --with-tbb-incdir=$TBBINC --with-tbb-libdir=$TBBLIB
+    cd ..
+    R CMD INSTALL -l ~/R Rth
 
 
 
 ## CUDA
 
-    R CMD INSTALL -l ~/R Rth \
-      --configure-args="--with-backend=CUDA"
+    cd Rth
+    ./configure --with-backend=CUDA
+    cd ..
+    R CMD INSTALL -l ~/R Rth
+
