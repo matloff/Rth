@@ -58,7 +58,7 @@ extern "C" SEXP rthtable(SEXP x, SEXP lb_, SEXP ub_,
   // a separate dimension in the output table
   const int nobsv = nrows(x);  // number of observations
   const int ndim = ncols(x);  // e.g. 2 for an m x n table
-  intvec dx(REAL(x), REAL(x)+nobsv*ndim);  // input data copied to device
+  intvec dx(INTEGER(x), INTEGER(x)+nobsv*ndim);  // input data copied to device
   
   // configuration of output table
   //

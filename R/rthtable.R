@@ -79,7 +79,8 @@ rthtable <- function(m,lb,ub,varnames=NULL,dnn=NULL,
    if (!is.integer(m))
      storage.mode(m) <- "integer"
    
-   freq <- .Call("rthtable",m,lb,ub,as.integer(nch),as.integer(nthreads))
+   freq <- .Call("rthtable",m,
+      as.integer(lb),as.integer(ub),as.integer(nch),as.integer(nthreads))
    
    # dimension labels
    if (is.null(dnn)) {
