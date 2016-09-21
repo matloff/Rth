@@ -1,11 +1,10 @@
 #################################################################
 
-PKG_CXXFLAGS = -I../inst/include/ 
-PKG_LIBS = 
+PKG_CXXFLAGS = -I../inst/include/
+PKG_LIBS =
 
-PKG_CPPFLAGS = -DTHRUST_DEVICE_SYSTEM=THRUST_DEVICE_SYSTEM_OMP $(SHLIB_OPENMP_CXXFLAGS)   # -Wfatal-errors
+PKG_CPPFLAGS = -DTHRUST_DEVICE_SYSTEM=THRUST_DEVICE_BACKEND_TBB # -Wfatal-errors
 
-#	rthcolsums.o \
 #	rthgini.o \
 #	rthhist.o \
 #	rthkendall.o \
@@ -15,6 +14,7 @@ PKG_CPPFLAGS = -DTHRUST_DEVICE_SYSTEM=THRUST_DEVICE_SYSTEM_OMP $(SHLIB_OPENMP_CX
 
 R_OBJS = \
 	hash.o \
+  rthcolsums.o\
 	rthdist.o \
 	rthmean.o \
 	rthnorm.o \
@@ -29,7 +29,7 @@ R_OBJS = \
 
 OBJECTS = $(R_OBJS)
 
-BACKEND = OPENMP
+BACKEND = TBB
 all: $(SHLIB)
 
 ifeq "$(BACKEND)" "CUDA"

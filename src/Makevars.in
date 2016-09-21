@@ -1,11 +1,10 @@
 #################################################################
 
-PKG_CXXFLAGS = -I../inst/include/ 
+PKG_CXXFLAGS = -I../inst/include/
 PKG_LIBS = @RTH_LDFLAGS@
 
 PKG_CPPFLAGS = @RTH_CPPFLAGS@   # -Wfatal-errors
 
-#	rthcolsums.o \
 #	rthgini.o \
 #	rthhist.o \
 #	rthkendall.o \
@@ -15,6 +14,7 @@ PKG_CPPFLAGS = @RTH_CPPFLAGS@   # -Wfatal-errors
 
 R_OBJS = \
 	hash.o \
+  rthcolsums.o\
 	rthdist.o \
 	rthmean.o \
 	rthnorm.o \

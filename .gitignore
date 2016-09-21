@@ -1,0 +1,6 @@
+# ignore build files
+*.o
+*.so
+
+# ignre log files
+config.*
