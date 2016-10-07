@@ -1,9 +1,9 @@
 #################################################################
 
 PKG_CXXFLAGS = -I../inst/include/
-PKG_LIBS = 
+PKG_LIBS = -L/usr/local/cuda/lib/ -L/usr/local/cuda/lib64/ -lcudart
 
-PKG_CPPFLAGS = -DTHRUST_DEVICE_SYSTEM=THRUST_DEVICE_SYSTEM_OMP $(SHLIB_OPENMP_CXXFLAGS)   # -Wfatal-errors
+PKG_CPPFLAGS = -DTHRUST_DEVICE_SYSTEM=THRUST_DEVICE_BACKEND_CUDA   # -Wfatal-errors
 
 #	rthgini.o \
 #	rthhist.o \
@@ -29,12 +29,12 @@ R_OBJS = \
 
 OBJECTS = $(R_OBJS)
 
-BACKEND = OPENMP
+BACKEND = CUDA
 all: $(SHLIB)
 
 ifeq "$(BACKEND)" "CUDA"
-NVCC = 
-CUDA_INCS = 
+NVCC = /usr/local/cuda/bin/nvcc -gencode arch=compute_20,code=compute_20 -Xcompiler -std=c++98
+CUDA_INCS = -I/usr/local/cuda/include -I/usr/include/R -I ../inst/include/
 
 %.o: %.cpp
 	$(NVCC) -DGPU -x cu -c -Xcompiler "-fPIC" $(CUDA_INCS) $< -o $@

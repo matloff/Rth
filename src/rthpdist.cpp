@@ -12,17 +12,17 @@
 // in output matrix, element in row i, column j gives the distance from
 // row i in dm1 to row j of dm2
 
-struct do1ival  
+struct do1ival
 {
-  const  thrust::device_vector<double>::iterator dm1;  // input matrix 
-  const  thrust::device_vector<double>::iterator dm2;  // input matrix 
+  const  thrust::device_vector<double>::iterator dm1;  // input matrix
+  const  thrust::device_vector<double>::iterator dm2;  // input matrix
   const  thrust::device_vector<double>::iterator dout;  // output matrix
   int nr1,nc,nr2;
   double *m1,*m2,*out;
-  do1ival(thrust::device_vector<double>::iterator _dm1, 
-          thrust::device_vector<double>::iterator _dm2, 
-          thrust::device_vector<double>::iterator _dout, 
-          int _nr1, int _nc, int _nr2): 
+  do1ival(thrust::device_vector<double>::iterator _dm1,
+          thrust::device_vector<double>::iterator _dm2,
+          thrust::device_vector<double>::iterator _dout,
+          int _nr1, int _nc, int _nr2):
     dm1(_dm1), dm2(_dm2),dout(_dout), nr1(_nr1), nc(_nc) , nr2(_nr2)
     {
       m1 = thrust::raw_pointer_cast(&dm1[0]);
@@ -30,7 +30,7 @@ struct do1ival
       out = thrust::raw_pointer_cast(&dout[0]);
     }
   __device__
-  void operator()(const int i)  
+  void operator()(const int i)
   // will compute and store all the distances from m1's row i
   // to rows of m2
   {
@@ -59,27 +59,27 @@ extern "C" SEXP rthpdist(SEXP inmat1, SEXP inmat2, SEXP nthreads)
   int nr1 = nrows(inmat1);
   int nc = ncols(inmat1);
   int nr2 = nrows(inmat2);
-  
+
   RTH_GEN_NTHREADS(nthreads);
-  
+
   thrust::device_vector<double> dmat1(REAL(inmat1), REAL(inmat1)+nr1*nc);
   thrust::device_vector<double> dmat2(REAL(inmat2), REAL(inmat2)+nr2*nc);
-  
+
   // make space for the output
   thrust::device_vector<double> ddst(nr1*nr2);
-  
+
   // iterators for row number of inmat1
   thrust::counting_iterator<int> iseqb(0);
   thrust::counting_iterator<int> iseqe = iseqb + nr1;
-  
-  // for each i in [iseqb,iseqe) find the distances from row i in inmat1 
+
+  // for each i in [iseqb,iseqe) find the distances from row i in inmat1
   // to all rows of inmat2
   thrust::for_each(iseqb,iseqe,
     do1ival(dmat1.begin(),dmat2.begin(),ddst.begin(),nr1,nc,nr2));
-  
+
   PROTECT(rout = allocMatrix(REALSXP, nr1, nr2));
   thrust::copy(ddst.begin(), ddst.end(), REAL(rout));
-  
+
   UNPROTECT(1);
   return rout;
 }
