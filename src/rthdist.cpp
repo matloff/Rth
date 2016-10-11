@@ -5,45 +5,48 @@
 
 // Rth substitute for R's dist() function
 
-// note that in addition to R using column-major order, Rcpp uses that
-// format too when converting an R matrix to an Rcpp vector
+// note that in addition to R using column-major order, Rcpp uses that format
+// too when converting an R matrix to an Rcpp vector
 
-// in output matrix, element in row i, column j gives the distance from
-// row i in dm to row j of dm; output is a full matrix, not a
-// triangular version
+// in output matrix, element in row i, column j gives the distance from row i in
+// dm to row j of dm; output is a full matrix, not a triangular version
 
-struct do1ival  
+struct distval
 {
-  const  thrust::device_vector<double>::iterator dm;  // input matrix 
-  const  thrust::device_vector<double>::iterator dout;  // output matrix
-  int nr,nc;
-  double *m,*out;
-  do1ival(thrust::device_vector<double>::iterator _dm, 
-          thrust::device_vector<double>::iterator _dout, 
-          int _nr, int _nc): 
-    dm(_dm), dout(_dout), nr(_nr), nc(_nc)
-    {
-       m = thrust::raw_pointer_cast(&dm[0]);
-       out = thrust::raw_pointer_cast(&dout[0]);
-    }
+  const thrust::device_vector<double>::iterator dinmat;
+  const thrust::device_vector<double>::iterator doutmat;
+  int nrow, ncol;
+
+  distval(
+    thrust::device_vector<double>::iterator _dinmat,
+    thrust::device_vector<double>::iterator _doutmat,
+    int _nrow,
+    int _ncol
+  ): dinmat(_dinmat), doutmat(_doutmat), nrow(_nrow), ncol(_ncol)
+  { }
+
+  // will compute and store all the distances from m's row i to rows j of m,
+  // for j > i
   __device__
-  void operator()(const int i)  
-  // will compute and store all the distances from m's row i
-  // to rows j of m, j > i 
-  {  
-    int j,k; double sum,tmp;
-    if (i == nr - 1) return;
-    for (j = i+1; j < nr; j++) {
-      // find distance from row i to row j
+  void operator()(const int i)
+  {
+    double tmp, sum;
+
+    // find distance from row i to row j
+    // j is row number, k is column number
+    for (int j = i + 1; j < nrow; j++)
+    {
       sum = 0;
-      for (k = 0; k < nc; k++) {  // is column number
-        tmp = m[k*nr+i] - m[k*nr+j];
-        sum += tmp*tmp;
+      for (int k = 0; k < ncol; k++)
+      {
+        tmp = dinmat[k*nrow+i] - dinmat[k*nrow+j];
+        sum += tmp * tmp;
       }
-      // result goes into elements (i,j) and (j,i) of out, a matrix 
-      // of dimensions nr x nr
+
+      // result goes into elements (i,j) and (j,i) of out, a matrix of
+      // dimensions nr x nr
       tmp = sqrt(sum);
-      out[j*nr+i] = out[i*nr+j] = tmp;
+      doutmat[j*nrow+i] = doutmat[i*nrow+j] = tmp;
     }
   }
 };
@@ -52,30 +55,26 @@ struct do1ival
 extern "C" SEXP rthdist(SEXP inmat, SEXP nthreads)
 {
   SEXP ret;
-  int nr = nrows(inmat);
-  int nc = ncols(inmat);
-  
+  int nrow = nrows(inmat);
+  int ncol = ncols(inmat);
+
   RTH_GEN_NTHREADS(nthreads);
-  
-  thrust::device_vector<double> dmat(REAL(inmat), REAL(inmat) + nr*nc);
-  
-  // make space for the output
-  thrust::device_vector<double> ddst(nr*nr);
-  
-  // iterators for row number of inmat
-  thrust::counting_iterator<int> iseqb(0);
-  thrust::counting_iterator<int> iseqe = iseqb + nr;
-  
-  // for each i in [iseqb,iseqe) find the distances from row i in inmat
-  // to all rows j of inmat, j > i
-  thrust::for_each(iseqb, iseqe,
-     do1ival(dmat.begin(), ddst.begin(), nr,nc));
-  
-  PROTECT(ret = allocMatrix(REALSXP, nr, nr));
-  thrust::copy(ddst.begin(), ddst.end(), REAL(ret));
-  
-  
+
+  thrust::device_vector<double> dinmat(REAL(inmat), REAL(inmat) + nrow * ncol);
+  thrust::device_vector<double> doutmat(nrow * nrow);
+
+  // find the distances from row i in inmat to all rows j of inmat, j > i
+  // the counting_iterator will act as the index for the row
+  thrust::for_each(
+    thrust::make_counting_iterator(0),
+    thrust::make_counting_iterator(nrow),
+    distval(dinmat.begin(), doutmat.begin(), nrow, ncol)
+  );
+
+  PROTECT(ret = allocMatrix(REALSXP, nrow, nrow));
+  thrust::copy(doutmat.begin(), doutmat.end(), REAL(ret));
   UNPROTECT(1);
+
   return ret;
 }
 

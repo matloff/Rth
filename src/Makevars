@@ -1,9 +1,9 @@
 #################################################################
 
 PKG_CXXFLAGS = -I../inst/include/
-PKG_LIBS =
+PKG_LIBS = 
 
-PKG_CPPFLAGS = -DTHRUST_DEVICE_SYSTEM=THRUST_DEVICE_BACKEND_TBB # -Wfatal-errors
+PKG_CPPFLAGS = -DTHRUST_DEVICE_SYSTEM=THRUST_DEVICE_SYSTEM_OMP $(SHLIB_OPENMP_CXXFLAGS)   # -Wfatal-errors
 
 #	rthgini.o \
 #	rthhist.o \
@@ -29,7 +29,7 @@ R_OBJS = \
 
 OBJECTS = $(R_OBJS)
 
-BACKEND = TBB
+BACKEND = OPENMP
 all: $(SHLIB)
 
 ifeq "$(BACKEND)" "CUDA"
