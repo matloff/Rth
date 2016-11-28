@@ -12,14 +12,14 @@
 // in output matrix, element in row i, column j gives the distance from
 // row i in dm1 to row j of dm2
 
-struct do1ival
+struct pdistval
 {
   const  thrust::device_vector<double>::iterator dm1;  // input matrix
   const  thrust::device_vector<double>::iterator dm2;  // input matrix
   const  thrust::device_vector<double>::iterator dout;  // output matrix
   int nr1,nc,nr2;
   double *m1,*m2,*out;
-  do1ival(thrust::device_vector<double>::iterator _dm1,
+  pdistval(thrust::device_vector<double>::iterator _dm1,
           thrust::device_vector<double>::iterator _dm2,
           thrust::device_vector<double>::iterator _dout,
           int _nr1, int _nc, int _nr2):
@@ -75,7 +75,7 @@ extern "C" SEXP rthpdist(SEXP inmat1, SEXP inmat2, SEXP nthreads)
   // for each i in [iseqb,iseqe) find the distances from row i in inmat1
   // to all rows of inmat2
   thrust::for_each(iseqb,iseqe,
-    do1ival(dmat1.begin(),dmat2.begin(),ddst.begin(),nr1,nc,nr2));
+    pdistval(dmat1.begin(),dmat2.begin(),ddst.begin(),nr1,nc,nr2));
 
   PROTECT(rout = allocMatrix(REALSXP, nr1, nr2));
   thrust::copy(ddst.begin(), ddst.end(), REAL(rout));
