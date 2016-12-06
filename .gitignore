@@ -1,6 +1,18 @@
 # ignore build files
 *.o
 *.so
+*.dylib
+*.d
+*.dll
+*.a
+*.rc
+*.rds
 
-# ignre log files
+# ignore config files
 config.*
+!config.h
+
+src/Makevars
+src/Makedeps
+src/Makeconf
+
