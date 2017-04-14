@@ -1,3 +1,6 @@
+# ignore editor files
+*.swp
+
 # ignore build files
 *.o
 *.so
