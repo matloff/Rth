@@ -42,17 +42,23 @@ extern "C" SEXP Rth_get_num_threads()
   else if (omp_nthreads != NULL)
     INT(nthreads) = atoi(omp_nthreads);
   else
-    INT(nthreads) = omp_get_max_threads(); // omp_get_max_threads
+    INT(nthreads) = omp_get_max_threads();
   #elif RTH_TBB
   if (rth_nthreads != NULL)
     INT(nthreads) = atoi(rth_nthreads);
   else
     INT(nthreads) = tbb::task_scheduler_init::automatic;
+  #elif RTH_CUDA
+    INT(nthreads) = 1;
   #else
   INT(nthreads) = RTH_ERROR;
   #endif
   
-  
+  if (INT(nthreads) <= 0)
+  {
+    INT(nthreads) = 1;
+  }
+
   UNPROTECT(1);
   return nthreads;
 }
