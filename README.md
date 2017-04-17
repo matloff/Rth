@@ -40,23 +40,27 @@ performance on both GPUs and multicore.
 
 ## Package Installation and Platform Requirements
 
-To build the package, you will need to have the correct build environment set
-up.  Exactly what that means depends on whether you wish to build Rth for use
-with a gpu or multicore.
+You will need to have the correct build environment set up.  Exactly
+what that means depends on whether you wish to build Rth for use with a
+gpu or multicore.
 
 If you have a CUDA-capable NVIDIA GPU, you will need the nvcc compiler and CUDA 
 development package.
 
 For the multicore case, you will need a C++ compiler with an OpenMP library 
 (this excludes clang++ at the time of writing).  GNU g++ should be sufficient.
+TBB is also accommodated.
 
+To install, unpack or clone the package, and read the INSTALL file.
 
 
 ## License and Copying
 
 Authors:
 
-* Norm Matloff, Drew Schmidt and Max Matsumoto
+* Norm Matloff (creator, author), Drew Schmidt (author) and Max
+  Matsumoto (author); special credit to Max for getting the package to
+  work with autoconf on all three parallel platforms
 
 The project is licensed under the GNU General Public License (GPL) 
-version >= 2.  Copyright 2012-2014 
+version >= 2.  Copyright 2012-2017 
