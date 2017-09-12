@@ -58,11 +58,12 @@ struct dochunk
   }
 };
 
-extern "C" SEXP rthtable(SEXP r_x,
-                         SEXP r_lowerbound,
-                         SEXP r_upperbound,
-                         SEXP r_numchunks,
-                         SEXP r_nthreads)
+extern "C" SEXP rthtable(
+  SEXP r_x,
+  SEXP r_lowerbound,
+  SEXP r_upperbound,
+  SEXP r_numchunks,
+  SEXP r_nthreads)
 {
   SEXP r_valcounts;
 

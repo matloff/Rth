@@ -9,39 +9,41 @@
 #include <math.h>
 
 #include "Rth.h"
+#include "rthutils.h"
 
-typedef thrust::device_vector<int> intvec;
-typedef thrust::device_vector<double> doublevec;
-
-extern "C" SEXP rthpearson(SEXP x, SEXP y, SEXP nthreads)
+extern "C" SEXP rthpearson(SEXP r_x, SEXP r_y, SEXP nthreads)
 {
-  SEXP cor;
-  int n = LENGTH(x);
-  doublevec dx(REAL(x), REAL(x)+n);
-  doublevec dy(REAL(x), REAL(x)+n);
-  double zero = (double) 0.0;
-  
+  SEXP r_correlation;
+
+  int length = LENGTH(r_x);
+  thrust::device_vector<flouble> d_x = rth::to_device_vector<flouble>(
+    r_x,
+    length
+  );
+  thrust::device_vector<flouble> d_y = rth::to_device_vector<flouble>(
+    r_y,
+    length
+  );
+
+  flouble zero = (flouble) 0.0;
+
   RTH_GEN_NTHREADS(nthreads);
-  
-  double xy =
-    thrust::inner_product(dx.begin(), dx.end(), dy.begin(), zero);
-  double x2 =
-    thrust::inner_product(dx.begin(), dx.end(), dx.begin(), zero);
-  double y2 =
-    thrust::inner_product(dy.begin(), dy.end(), dy.begin(), zero);
-  double xt =
-    thrust::reduce(dx.begin(), dx.end());
-  double yt =
-    thrust::reduce(dy.begin(), dy.end());
-  double xm = xt/n, ym = yt/n;
-  double xsd = sqrt(x2/n - xm*xm);
-  double ysd = sqrt(y2/n - ym*ym);
-  
-  PROTECT(cor = allocVector(REALSXP, 1));
-  REAL(cor)[0] = (xy/n - xm*ym) / (xsd*ysd);
-  
+
+  flouble xy = thrust::inner_product(d_x.begin(), d_x.end(), d_y.begin(), zero);
+  flouble x2 = thrust::inner_product(d_x.begin(), d_x.end(), d_x.begin(), zero);
+  flouble y2 = thrust::inner_product(d_y.begin(), d_y.end(), d_y.begin(), zero);
+  flouble xt = thrust::reduce(d_x.begin(), d_x.end());
+  flouble yt = thrust::reduce(d_y.begin(), d_y.end());
+  flouble xm = xt/length;
+  flouble ym = yt/length;
+  flouble xsd = sqrt(x2/length - xm*xm);
+  flouble ysd = sqrt(y2/length - ym*ym);
+
+  PROTECT(r_correlation = allocVector(REALSXP, 1));
+  REAL(r_correlation)[0] = (xy/length - xm*ym) / (xsd*ysd);
+
   UNPROTECT(1);
-  return cor;
+  return r_correlation;
 }
 
 

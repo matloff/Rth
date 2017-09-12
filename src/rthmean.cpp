@@ -5,40 +5,45 @@
 #include <thrust/functional.h>
 
 #include "Rth.h"
-
-
+#include "rthutils.h"
 
 /* mean */
 struct div_by_n
 {
   const int n;
-  
+
   div_by_n(int _n) : n(_n) {}
-  
+
   __host__ __device__
-  flouble operator()(flouble x) const
+  flouble operator()(flouble val) const
   {
-    return x/((flouble) n);
+    return val/((flouble) n);
   }
 };
 
-
-
 // FIXME very slow
-extern "C" SEXP rthmean(SEXP x, SEXP nthreads)
+extern "C" SEXP rthmean(SEXP r_input, SEXP nthreads)
 {
-  SEXP avg;
-  PROTECT(avg = allocVector(REALSXP, 1));
-  const int n = LENGTH(x);
-  
+  SEXP r_avg;
+  PROTECT(r_avg = allocVector(REALSXP, 1));
+  const int length = LENGTH(r_input);
+
   RTH_GEN_NTHREADS(nthreads);
-  
-  thrust::device_vector<flouble> dx(REAL(x), REAL(x)+n);
-  
-  thrust::plus<flouble> binop;
-  REAL(avg)[0] = (double) thrust::transform_reduce(dx.begin(), dx.end(), div_by_n(n), (flouble) 0., binop);
-  
+
+  thrust::device_vector<flouble> d_array = rth::to_device_vector<flouble>(
+    r_input,
+    length
+  );
+
+  REAL(r_avg)[0] = (flouble) thrust::transform_reduce(
+    d_array.begin(),
+    d_array.end(),
+    div_by_n(length),
+    (flouble) 0.0,
+    thrust::plus<flouble>()
+  );
+
   UNPROTECT(1);
-  return avg;
+  return r_avg;
 }
 

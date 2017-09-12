@@ -2,6 +2,7 @@
 #include <thrust/device_vector.h>
 
 #include "Rth.h"
+#include "rthutils.h"
 
 // Rth substitute for R's dist() function
 
@@ -11,70 +12,75 @@
 // in output matrix, element in row i, column j gives the distance from row i in
 // dm to row j of dm; output is a full matrix, not a triangular version
 
-struct distval
+struct calculate_dist
 {
-  const thrust::device_vector<double>::iterator dinmat;
-  const thrust::device_vector<double>::iterator doutmat;
-  int nrow, ncol;
+  const thrust::device_vector<flouble>::iterator d_in_matrix;
+  const thrust::device_vector<flouble>::iterator d_out_matrix;
+  int rows;
+  int cols;
 
-  distval(
-    thrust::device_vector<double>::iterator _dinmat,
-    thrust::device_vector<double>::iterator _doutmat,
-    int _nrow,
-    int _ncol
-  ): dinmat(_dinmat), doutmat(_doutmat), nrow(_nrow), ncol(_ncol)
+  calculate_dist(
+    thrust::device_vector<flouble>::iterator in_matrix,
+    thrust::device_vector<flouble>::iterator out_matrix,
+    int _rows,
+    int _cols
+  ): d_in_matrix(in_matrix), d_out_matrix(out_matrix), rows(_rows), cols(_cols)
   { }
 
-  // will compute and store all the distances from m's row i to rows j of m,
-  // for j > i
   __device__
-  void operator()(const int i)
+  void operator()(const int index)
   {
-    double tmp, sum;
+    flouble tmp;
+    flouble sum;
 
-    // find distance from row i to row j
-    // j is row number, k is column number
-    for (int j = i + 1; j < nrow; j++)
+    for (int row = index + 1; row < rows; row++)
     {
       sum = 0;
-      for (int k = 0; k < ncol; k++)
-      {
-        tmp = dinmat[k*nrow+i] - dinmat[k*nrow+j];
+      for (int col = 0; col < cols; col++) {
+        int current_index = rth::row_major_index(col, rows, index);
+        int row_index = rth::row_major_index(col, rows, row);
+        tmp = d_in_matrix[current_index] - d_in_matrix[row_index];
         sum += tmp * tmp;
       }
 
-      // result goes into elements (i,j) and (j,i) of out, a matrix of
-      // dimensions nr x nr
       tmp = sqrt(sum);
-      doutmat[j*nrow+i] = doutmat[i*nrow+j] = tmp;
+      int row_output_index = rth::row_major_index(row, rows, index);
+      int current_output_index = rth::row_major_index(index, rows, row);
+      d_out_matrix[row_output_index] = d_out_matrix[current_output_index] = tmp;
     }
   }
 };
 
 // compute distances from rows of inmat1 to rows of inmat2
-extern "C" SEXP rthdist(SEXP inmat, SEXP nthreads)
+extern "C" SEXP rthdist(SEXP r_matrix, SEXP nthreads)
 {
-  SEXP ret;
-  int nrow = nrows(inmat);
-  int ncol = ncols(inmat);
+  SEXP r_ret;
+  int rows = nrows(r_matrix);
+  int cols = ncols(r_matrix);
+  int size = rows * cols;
 
   RTH_GEN_NTHREADS(nthreads);
 
-  thrust::device_vector<double> dinmat(REAL(inmat), REAL(inmat) + nrow * ncol);
-  thrust::device_vector<double> doutmat(nrow * nrow);
+  thrust::device_vector<flouble> d_matrix = rth::to_device_vector<flouble>(
+    r_matrix,
+    size
+  );
+  thrust::device_vector<flouble> d_out_matrix = rth::make_device_vector<flouble>(
+    rows * rows
+  );
 
   // find the distances from row i in inmat to all rows j of inmat, j > i
   // the counting_iterator will act as the index for the row
   thrust::for_each(
     thrust::make_counting_iterator(0),
-    thrust::make_counting_iterator(nrow),
-    distval(dinmat.begin(), doutmat.begin(), nrow, ncol)
+    thrust::make_counting_iterator(rows),
+    calculate_dist(d_matrix.begin(), d_out_matrix.begin(), rows, cols)
   );
 
-  PROTECT(ret = allocMatrix(REALSXP, nrow, nrow));
-  thrust::copy(doutmat.begin(), doutmat.end(), REAL(ret));
+  PROTECT(r_ret = allocMatrix(REALSXP, rows, rows));
+  thrust::copy(d_out_matrix.begin(), d_out_matrix.end(), REAL(r_ret));
   UNPROTECT(1);
 
-  return ret;
+  return r_ret;
 }
 

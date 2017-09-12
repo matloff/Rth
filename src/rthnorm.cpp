@@ -6,121 +6,81 @@
 #include <cmath>
 
 #include "Rth.h"
+#include "rthutils.h"
 
-template <typename T>
 struct ppow
 {
-  double p;
-  
+  const int p;
+
+  ppow(const int p) : p(p) {}
+
   __host__ __device__
-  T operator()(const T& x) const 
-  { 
-    return std::pow(std::abs(x), p);
-  }
-};
-
-template <typename T>
-struct ppow1
-{
-  __host__ __device__
-  T operator()(const T& x) const 
-  { 
-    return std::abs(x);
-  }
-};
-
-template <typename T>
-struct ppow2
-{
-  __host__ __device__
-  T operator()(const T& x) const 
-  { 
-    return x*x;
-  }
-};
-
-
-
-// Norm of vector
-double calc_norm(double *x, const int len, const double p)
-{
-  thrust::plus<double> binary_op;
-  double norm;
-  
-  thrust::device_vector<double> dx(x, x + len);
-  
-  
-  if (p == 2) // Frobenius aka 2-norm
+  flouble operator() (flouble val)
   {
-    norm = thrust::transform_reduce(dx.begin(), dx.end(), ppow2<double>(), 0., binary_op);
-    norm = std::sqrt(norm);
+    return std::pow(std::abs(val), p);
   }
-  else if (p == 1) // 1-norm
-    norm = thrust::transform_reduce(dx.begin(), dx.end(), ppow1<double>(), 0., binary_op);
-  else
-  {
-    norm = thrust::transform_reduce(dx.begin(), dx.end(), ppow<double>(), 0., binary_op);
-    norm = std::pow(norm, 1./p);
-  }
-  return norm;
-}
-
+};
 
 
 // Euclidean distance of two vectors
+/*
 double calc_dist(double *x, const double *y, const int len, const double p)
 {
   int i;
   double *diff;
   double dist;
-  
+
   diff = (double *) malloc(len * sizeof(diff));
-  
+
   for (i=0; i<len; i++)
     diff[i] = x[i] - y[i];
-  
+
   dist = calc_norm(diff, len, p);
-  
+
   free(diff);
-  
+
   return dist;
 }
+*/
 
+#define ONE_NORM 1
+#define TWO_NORM 2
 
-
-// Wrappers
-extern "C" SEXP rth_norm(SEXP x_, SEXP p_, SEXP nthreads)
+extern "C" SEXP rthnorm(SEXP r_array, SEXP r_p, SEXP nthreads)
 {
-  double *x = REAL(x_);
-  int len = LENGTH(x_);
-  double p = REAL(p_)[0];
-  
-  SEXP nrm;
-  PROTECT(nrm = allocVector(REALSXP, 1));
-  
+  SEXP r_norm;
+  PROTECT(r_norm = allocVector(REALSXP, 1));
+
+  const int length = LENGTH(r_array);
+  const int p = REAL(r_p)[0];
+
   RTH_GEN_NTHREADS(nthreads);
+
+  thrust::device_vector<flouble> d_array = rth::to_device_vector<flouble>(
+    r_array,
+    length
+  );
+
+  flouble norm = thrust::transform_reduce(
+    d_array.begin(),
+    d_array.end(),
+    ppow(p),
+    0.0,
+    thrust::plus<flouble>()
+  );
+
+  if (p == TWO_NORM)
+  {
+    norm = std::sqrt(norm);
+  }
+  else if (p != ONE_NORM)
+  {
+    norm = std::pow(norm, 1.0/p);
+  }
   
-  REAL(nrm)[0] = calc_norm(x, len, p);
-  
+  REAL(r_norm)[0] = norm;
+
   UNPROTECT(1);
-  return nrm;
-}
-
-
-
-extern "C" SEXP rth_dist(SEXP x_, SEXP y_, SEXP p_)
-{
-  double *x = REAL(x_);
-  double *y = REAL(y_);
-  const double p = REAL(p_)[0];
-  const int len = LENGTH(x_);
-  
-  SEXP dist;
-  PROTECT(dist = allocVector(REALSXP, 1));
-  
-  REAL(dist)[0] = calc_dist(x, y, len, p);
-  
-  UNPROTECT(1);
-  return dist;
+  return r_norm;
 }
 

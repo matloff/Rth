@@ -1,0 +1,12 @@
+Tests for Rth are heavily dependent on which backend you would like to use. As a
+result, it is required that Rth is built and installed in order to run these
+tests.
+
+To run the tests, execute Rscript testthat.R.
+Ensure the Rth package is either accessable at the root level, or via
+R_LIBS_USER. Alternatively, you may change the library location in testthat.R to
+load from a specific location.
+
+These tests are intended for internal use by developers for more confidence that
+all functions work, and will continue to work as more are developed. The tests
+are not inteded to be run on CRAN or by R CMD check.

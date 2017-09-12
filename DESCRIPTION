@@ -8,6 +8,8 @@ Description: Thrust is a powerful tool for parallel programming. Rth consists
 License: GPL (>= 2)
 Depends:
     R (>= 2.14.0)
+Suggests:
+    testthat
 SystemRequirements: GNU make.  If building with CUDA backend, then
     Nvidia's CUDA toolkit (>= release 5.0) is required.
 NeedsCompilation: yes

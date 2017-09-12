@@ -14,67 +14,62 @@
 #include <thrust/functional.h>
 
 #include "Rth.h"
+#include "rthutils.h"
 
 // note that R uses column-major order, and Rcpp vectors retain this ordering
 
 // convert a linear index to a column index
-struct lintocol: public thrust::unary_function<int,int>
+struct lin_to_col: public thrust::unary_function<int,int>
 {
-  int nr; // number of rows
+  int num_rows;
 
   __host__ __device__
-  lintocol(int nr) : nr(nr) {}
+  lin_to_col(int num_rows) : num_rows(num_rows) {}
 
   __host__ __device__
-  int operator()(int i)
+  int operator()(int index)
   {
-    return i / nr;
+    return index / num_rows;
   }
 };
 
-extern "C" SEXP rthcolsums(SEXP m, SEXP nthreads)
+extern "C" SEXP rthcolsums(SEXP r_matrix, SEXP nthreads)
 {
-  SEXP ret;
+  SEXP r_ret;
 
-  int rows = nrows(m);
-  int cols = ncols(m);
-  int mlength = rows * cols;
+  int rows = nrows(r_matrix);
+  int cols = ncols(r_matrix);
+  int length = rows * cols;
 
   RTH_GEN_NTHREADS(nthreads);
 
-  thrust::device_vector<double> mcopy(REAL(m), REAL(m) + mlength);
-
-  // colsums will be device vector for the column sums
-  thrust::device_vector<double> colsums(cols);
-
-  // colindices will be the "output keys"
-  thrust::device_vector<int> colindices(rows);
-  thrust::reduce_by_key
-  (
-    // start of input key vector; we take the counting iterator,
-    // 0,1,2,..., and apply our index-conversion functor to it
-    thrust::make_transform_iterator(thrust::counting_iterator<int>(0),
-     lintocol(rows)),
-
-    // end of the input key vector,
-    thrust::make_transform_iterator(thrust::counting_iterator<int>(0),
-     lintocol(rows)) + mlength,
-
-    // the input vector
-    mcopy.begin(),
-
-    // output keys, not used in this case, but deals with "empty rows" in
-    // "ragged matrix" settings
-    colindices.begin(),
-
-    // at long last, our column sums
-    colsums.begin()
+  thrust::device_vector<flouble> d_matrix = rth::to_device_vector<flouble>(
+    r_matrix,
+    length
   );
 
-  // prepare to convert to R form
-  PROTECT(ret = allocVector(REALSXP, cols));
-  thrust::copy(colsums.begin(), colsums.end(), REAL(ret));
+  thrust::device_vector<flouble> d_col_sums = rth::make_device_vector<flouble>(
+    cols
+  );
+  thrust::device_vector<int> d_col_indices = rth::make_device_vector<int>(rows);
+  thrust::reduce_by_key
+  (
+    thrust::make_transform_iterator(
+      thrust::counting_iterator<int>(0),
+      lin_to_col(rows)
+    ),
+    thrust::make_transform_iterator(
+      thrust::counting_iterator<int>(length),
+      lin_to_col(rows)
+    ),
+    d_matrix.begin(),
+    d_col_indices.begin(),
+    d_col_sums.begin()
+  );
+
+  PROTECT(r_ret = allocVector(REALSXP, cols));
+  thrust::copy(d_col_sums.begin(), d_col_sums.end(), REAL(r_ret));
 
   UNPROTECT(1);
-  return ret;
+  return r_ret;
 }

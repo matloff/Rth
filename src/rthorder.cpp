@@ -7,45 +7,54 @@
 #include <thrust/sort.h>
 
 #include "Rth.h"
+#include "rthutils.h"
 
+/*
+TODO: extract these to a different file so we don't have to type
+thrust::device_vector ...
 typedef thrust::device_vector<int> intvec;
 typedef thrust::device_vector<double> doublevec;
 typedef intvec::iterator intveciter;
 typedef doublevec::iterator doubleveciter;
+*/
 
-// returns order(x) in out, unless *rnk=TRUE, in which case 
-// rank(x) is returned
-//
-// x is overwritten
-extern "C" SEXP rthorder(SEXP x, SEXP rnk, SEXP nthreads) 
+// returns order(x) in out, unless *rnk=TRUE, in which case rank(x) is returned
+extern "C" SEXP rthorder(SEXP r_array, SEXP r_rank, SEXP nthreads) 
 {
-  const int n = LENGTH(x);
-  bool rank = (bool) INTEGER(rnk)[0];
+  const int length = LENGTH(r_array);
+  bool rank = (bool) INTEGER(r_rank)[0];
   
-  SEXP ret;
-  PROTECT(ret = allocVector(INTSXP, n));
+  SEXP r_ret;
+  PROTECT(r_ret = allocVector(INTSXP, length));
   
   RTH_GEN_NTHREADS(nthreads);
   
-  doublevec dx(REAL(x), REAL(x)+n);
+  thrust::device_vector<flouble> d_array = rth::to_device_vector<flouble>(
+    r_array,
+    length
+  );
   
-  intvec seq(n);
-  thrust::sequence(seq.begin(),seq.end());
-  thrust::sort_by_key(dx.begin(),dx.end(),seq.begin());
+  thrust::device_vector<int> d_sequence = rth::make_device_vector<int>(length);
+  thrust::sequence(d_sequence.begin(), d_sequence.end());
+  thrust::sort_by_key(d_array.begin(), d_array.end(), d_sequence.begin());
+
   if (!rank) 
-    thrust::copy(seq.begin(), seq.end(), INTEGER(ret));
+  {
+    thrust::copy(d_sequence.begin(), d_sequence.end(), INTEGER(r_ret));
+  }
   else 
   {
-    thrust::counting_iterator<int> seqa(0);
-    thrust::counting_iterator<int> seqb =  seqa + n;
-    intvec locout(n);
-    thrust::scatter(seqa,seqb,seq.begin(),locout.begin()); 
-    thrust::copy(locout.begin(), locout.end(), INTEGER(ret));
+    thrust::device_vector<int> d_out = rth::make_device_vector<int>(length);
+    thrust::scatter(
+      thrust::make_counting_iterator(0),
+      thrust::make_counting_iterator(length),
+      d_sequence.begin(),
+      d_out.begin()
+    ); 
+    thrust::copy(d_out.begin(), d_out.end(), INTEGER(r_ret));
   }
   
   UNPROTECT(1);
-  return ret;
+  return r_ret;
 }
-
-
 
