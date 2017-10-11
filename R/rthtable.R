@@ -31,7 +31,6 @@
 #' (in the case of OpenMP or TBB backends) that the routine should (at most)
 #' use.  Does nothing with a CUDA backend.  See \link{nthreads}.
 #' @param nch Number of chunks for partitioning the data.
-#' @param lins Linear indices to convert to multidimensional ones.
 #' @return The function \code{rthtable()} returns an object of R class
 #' \code{table}.
 #' 

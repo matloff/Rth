@@ -21,4 +21,5 @@ Authors@R: c(person("Norm", "Matloff", role = c("aut", "cre"),
     person("Matsumoto", "Maxwell", role = "aut",
     email = "mmmatsumoto@ucdavis.edu")
     )
-Maintainer: Norm Matloff <matloff@cs.ucdavis.edu>
+Maintainer: Norm Matloff <nsmatloff@ucdavis.edu>
+RoxygenNote: 6.0.1

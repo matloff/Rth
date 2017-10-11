@@ -1,4 +1,3 @@
-#' @export
 rthgini <- function(x, unbiased=TRUE, na.rm=FALSE, nthreads=rth.nthreads())
 {
   if (na.rm)
