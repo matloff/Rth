@@ -101,7 +101,7 @@ elif test "X${BACKEND}" = "XTBB"; then
 
 elif test "X${BACKEND}" = "XCUDA"; then
   AC_MSG_RESULT([Using CUDA backend])
-  AC_PROG_CXX([${cuda_home}/bin/nvcc nvcc])
+  AC_PROG_CXX([nvcc ${cuda_home}/bin/nvcc])
   AC_LANG([C++])
 
   NVCC="${cuda_home}/bin/nvcc -gencode arch=compute_20,code=compute_20 -Xcompiler -std=c++98"
