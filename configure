@@ -588,6 +588,7 @@ CUDA_INCS
 NVCC
 RTH_LDFLAGS
 RTH_CPPFLAGS
+PKG_CPPFLAGS
 BACKEND
 OPENMP_CXXFLAGS
 OBJEXT
@@ -639,6 +640,7 @@ SHELL'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
+with_thrust_home
 with_cuda_home
 with_tbb_incdir
 with_tbb_libdir
@@ -1277,6 +1279,8 @@ Optional Features:
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --with-thrust-home[=DIR]
+                          Set Thrust install dir [/usr/local/cuda/include]
   --with-cuda-home[=DIR]  Set CUDA install dir [/usr/local/cuda]
   --with-tbb-incdir[=DIR] Set TBB include directory [/usr/include]
   --with-tbb-libdir[=DIR] Set TBB library directory [/usr/lib/tbb]
@@ -1808,6 +1812,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
+## Thrust path
+
+# Check whether --with-thrust-home was given.
+if test "${with_thrust_home+set}" = set; then :
+  withval=$with_thrust_home; thrust_home=$withval
+else
+  thrust_home=/usr/local/cuda/include
+
+fi
+
+
 ### CUDA paths
 
 # Check whether --with-cuda-home was given.
@@ -1817,7 +1832,6 @@ else
   cuda_home=/usr/local/cuda
 
 fi
-
 
 
 ### TBB paths
@@ -1841,8 +1855,6 @@ else
 fi
 
 
-
-
 ### Set backend flags
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking thrust backend" >&5
 $as_echo_n "checking thrust backend... " >&6; }
@@ -1856,7 +1868,7 @@ else
 fi
 
 
-
+PKG_CPPFLAGS="-I${thrust_home}"
 
 if test "X${BACKEND}" = "XOPENMP"; then
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: Using OpenMP backend" >&5
@@ -3050,6 +3062,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 else
   as_fn_error $? "Unknown backend; use one of OPENMP, TBB, or CUDA." "$LINENO" 5
 fi
+
 
 
 

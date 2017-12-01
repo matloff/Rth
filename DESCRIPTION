@@ -11,7 +11,9 @@ Depends:
 Suggests:
     testthat
 SystemRequirements: GNU make.  If building with CUDA backend, then
-    Nvidia's CUDA toolkit (>= release 5.0) is required.
+    Nvidia's CUDA toolkit (>= release 5.0) is required. If using a
+    backend other than CUDA, and CUDA is not installed on the system,
+    Thrust will need to be installed.
 NeedsCompilation: yes
 ByteCompile: yes
 Authors@R: c(person("Norm", "Matloff", role = c("aut", "cre"),

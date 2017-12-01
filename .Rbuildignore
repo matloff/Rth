@@ -1,4 +1,12 @@
+^\.git$
+^\.gitignore
+\.o$
+\.so$
+\.dll$
+^cleanup$
+^demo$
 ^README\.md$
 ^reconf$
 ^redocument$
 ^test$
+^TODO$

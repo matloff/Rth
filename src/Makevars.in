@@ -1,9 +1,8 @@
 #################################################################
 
-PKG_CXXFLAGS = -I../inst/include/
 PKG_LIBS = @RTH_LDFLAGS@
 
-PKG_CPPFLAGS = @RTH_CPPFLAGS@   # -Wfatal-errors
+PKG_CPPFLAGS = @RTH_CPPFLAGS@ @PKG_CPPFLAGS@  # -Wfatal-errors
 
 #	rthgini.o \
 #	rthhist.o \

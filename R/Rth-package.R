@@ -18,5 +18,6 @@
 #' @author Norm Matloff
 #' @references \url{http://heather.cs.ucdavis.edu/~matloff/rth.html}
 #' @keywords Package
+#' @importFrom stats na.omit
 NULL
 

@@ -1,35 +1,44 @@
 # Rth Installation
 
-Below, the installation directory is ~/R; change as desired.  
+Below, the installation directory is ~/R; change as desired.
 
-Download the package to a directory Rth (can delete after installation), so that for example the R code is now in Rth/R.  
+Download the package to a directory Rth (can delete after installation), so that
+for example the R code is now in Rth/R.
 
 Then do one of the following, according to the desired backend.
 
+## Thrust
+If your system has a working CUDA 4.0 or above installation, you may safely skip
+this section.
+
+You will need a copy of the Thrust template library to use any of the Rth
+backends. To install Thrust, please refer to the Quick Start Guide in the Thrust
+Wiki (https://github.com/thrust/thrust/wiki/Quick-Start-Guide).
+
+Pay close attention to the warning not to install Thrust to the standard *nix
+include directory /usr/local/include/.
+
+### Setting the Thrust path for compilation
+Rth accepts the configure argument thrust-home, which defaults to
+/usr/local/cuda/include/.
+
+If your Thrust installation path differs from the default, simply pass
+--with-thrust-home=/your/thrust/path/ in the --configure-args during the install
+phase.
+
 ## OpenMP
 
-Assuming you have an OpenMP-compatible C++ compiler (on a Mac, install the OpenMP-compatible version of clang):
+Assuming you have an OpenMP-compatible C++ compiler (on a Mac, install the
+OpenMP-compatible version of clang):
 
-
-    cd Rth
-    ./configure --with-backend=OPENMP
-    cd ..
-    R CMD INSTALL -l ~/R Rth
+    R CMD INSTALL -l ~/R path/to/Rth --configure-args="--with-backend=OPENMP"
 
 ## Intel Thread Building Blocks
 
-
-    cd Rth
-    ./configure --with-backend=TBB --with-tbb-incdir=$TBBINC --with-tbb-libdir=$TBBLIB
-    cd ..
-    R CMD INSTALL -l ~/R Rth
-
-
+    R CMD INSTALL -l ~/R path/to/Rth \
+        --configure-args="--with-backend=TBB --with-tbb-incdir=$TBBINC --with-tbb-libdir=$TBBLIB"
 
 ## CUDA
 
-    cd Rth
-    ./configure --with-backend=CUDA
-    cd ..
-    R CMD INSTALL -l ~/R Rth
+    R CMD INSTALL -l ~/R path/to/Rth --configure-args="--with-backend=CUDA"
 

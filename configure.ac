@@ -26,6 +26,16 @@
 
 AC_INIT(DESCRIPTION)
 
+## Thrust path
+AC_ARG_WITH([thrust-home],
+  AS_HELP_STRING(
+    [--with-thrust-home@<:@=DIR@:>@],
+    [Set Thrust install dir @<:@]m4_default(/usr/local/cuda/include)[@:>@]
+  ),
+  [thrust_home=$withval],
+  [thrust_home=/usr/local/cuda/include]
+)
+
 ### CUDA paths
 AC_ARG_WITH([cuda-home],
   AS_HELP_STRING(
@@ -35,7 +45,6 @@ AC_ARG_WITH([cuda-home],
   [cuda_home=$withval],
   [cuda_home=/usr/local/cuda]
 )
-
 
 ### TBB paths
 AC_ARG_WITH([tbb-incdir],
@@ -56,8 +65,6 @@ AC_ARG_WITH([tbb-libdir],
   [tbb_libdir=/usr/lib/]
 )
 
-
-
 ### Set backend flags
 AC_MSG_CHECKING([thrust backend])
 AC_ARG_WITH(backend,
@@ -69,7 +76,7 @@ AC_ARG_WITH(backend,
   [BACKEND="OPENMP"]
 )
 
-
+PKG_CPPFLAGS="-I${thrust_home}"
 
 if test "X${BACKEND}" = "XOPENMP"; then
   AC_MSG_RESULT([Using OpenMP backend])
@@ -118,6 +125,7 @@ fi
 
 dnl Start to substitute templates
 AC_SUBST(BACKEND)
+AC_SUBST(PKG_CPPFLAGS)
 AC_SUBST(RTH_CPPFLAGS)
 AC_SUBST(RTH_LDFLAGS)
 AC_SUBST(NVCC)
