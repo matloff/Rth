@@ -33,7 +33,7 @@ struct lin_to_col: public thrust::unary_function<int,int>
   }
 };
 
-extern "C" SEXP rthcolsums(SEXP r_matrix, SEXP nthreads)
+extern "C" SEXP c_rthcolsums(SEXP r_matrix, SEXP nthreads)
 {
   SEXP r_ret;
 

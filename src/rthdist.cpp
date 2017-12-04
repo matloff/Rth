@@ -52,7 +52,7 @@ struct calculate_dist
 };
 
 // compute distances from rows of inmat1 to rows of inmat2
-extern "C" SEXP rthdist(SEXP r_matrix, SEXP nthreads)
+extern "C" SEXP c_rthdist(SEXP r_matrix, SEXP nthreads)
 {
   SEXP r_ret;
   int rows = nrows(r_matrix);

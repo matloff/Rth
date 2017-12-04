@@ -5,7 +5,7 @@
 #include "Rth.h"
 #include "rthutils.h"
 
-extern "C" SEXP rthsort_double(
+extern "C" SEXP c_rthsort_double(
   SEXP r_input,
   SEXP r_decreasing,
   SEXP r_inplace,
@@ -48,7 +48,7 @@ extern "C" SEXP rthsort_double(
   }
 }
 
-extern "C" SEXP rthsort_int(
+extern "C" SEXP c_rthsort_int(
    SEXP r_input,
    SEXP r_decreasing,
    SEXP r_inplace,

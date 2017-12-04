@@ -46,5 +46,5 @@ x  # but x is now a sorted version of itself
 
 }
 \references{
-\url{https://docs.thrust.googlecode.com/hg/group__sorting.html}
+\url{http://thrust.github.io/doc/group__sorting.html}
 }

@@ -46,7 +46,7 @@ double calc_dist(double *x, const double *y, const int len, const double p)
 #define ONE_NORM 1
 #define TWO_NORM 2
 
-extern "C" SEXP rthnorm(SEXP r_array, SEXP r_p, SEXP nthreads)
+extern "C" SEXP c_rthnorm(SEXP r_array, SEXP r_p, SEXP nthreads)
 {
   SEXP r_norm;
   PROTECT(r_norm = allocVector(REALSXP, 1));

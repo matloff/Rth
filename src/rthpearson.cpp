@@ -11,7 +11,7 @@
 #include "Rth.h"
 #include "rthutils.h"
 
-extern "C" SEXP rthpearson(SEXP r_x, SEXP r_y, SEXP nthreads)
+extern "C" SEXP c_rthpearson(SEXP r_x, SEXP r_y, SEXP nthreads)
 {
   SEXP r_correlation;
 

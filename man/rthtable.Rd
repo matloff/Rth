@@ -51,7 +51,7 @@ indices to multidimensional ones.
 
 \dontrun{
 library(MASS)
-pm <- Pima.te  
+pm <- Pima.te
 # cut diabetic pedigree, age into 3 ranges
 pm$ped1 <- cut(pm$ped,3,1:3)
 pm$age1 <- cut(pm$age,3,1:3)

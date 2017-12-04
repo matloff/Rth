@@ -12,21 +12,21 @@
 #' @return Norm of a vector
 #'
 #' @examples
-#' 
+#'
 #' \dontrun{
 #' x <- c(5,2,12,13,8,0,50)
 #' x
 #' rthnorm(x)
 #' }
-#' 
+#'
 #' @export
 rthnorm <- function(x, p=2, nthreads=rth.nthreads())
 {
   if (!is.double(x))
     storage.mode(x) <- "double"
-  
-  ret <- .Call("rthnorm", x, as.double(p), as.integer(nthreads), PACKAGE="Rth")
-  
+
+  ret <- .Call(c_rthnorm, x, as.double(p), as.integer(nthreads))
+
   return( ret )
 }
 

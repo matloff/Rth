@@ -2,7 +2,7 @@
 
 PKG_LIBS = @RTH_LDFLAGS@
 
-PKG_CPPFLAGS = @RTH_CPPFLAGS@ @PKG_CPPFLAGS@  # -Wfatal-errors
+PKG_CPPFLAGS = @RTH_CPPFLAGS@ @PKG_CPPFLAGS@
 
 #	rthgini.o \
 #	rthhist.o \
@@ -23,7 +23,8 @@ R_OBJS = \
 	rthsort.o \
 	rthtable.o \
 	rthxpos.o \
-	threads.o
+	threads.o \
+  init.o
 
 
 OBJECTS = $(R_OBJS)

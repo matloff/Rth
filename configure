@@ -2730,9 +2730,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
   TMP_LDFLAGS=${LDFLAGS}
-  # CPPFLAGS="-I${tbb_incdir}"
   LDFLAGS="-L${tbb_libdir} ${TMP_LDFLAGS}"
-  # AC_CHECK_HEADERS([tbb.h], [],AC_MSG_ERROR([tbb.h not found]), [[]])
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for TBB_runtime_interface_version in -ltbb" >&5
 $as_echo_n "checking for TBB_runtime_interface_version in -ltbb... " >&6; }
 if ${ac_cv_lib_tbb_TBB_runtime_interface_version+:} false; then :
@@ -2780,7 +2778,6 @@ else
   as_fn_error $? "\"Unable to link with Intel TBB" "$LINENO" 5
 fi
 
-  # LDFLAGS=${TMP_LDFLAGS}
 
   RTH_CPPFLAGS="-DTHRUST_DEVICE_SYSTEM=THRUST_DEVICE_BACKEND_TBB -I${tbb_incdir}/tbb"
   RTH_LDFLAGS="-L${tbb_libdir}/tbb -ltbb"

@@ -37,7 +37,7 @@ struct transpose
   }
 };
 
-extern "C" SEXP rthxpos(SEXP r_matrix)
+extern "C" SEXP c_rthxpos(SEXP r_matrix)
 {
   SEXP r_out;;
   int rows = nrows(r_matrix);

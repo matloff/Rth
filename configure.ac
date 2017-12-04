@@ -97,11 +97,8 @@ elif test "X${BACKEND}" = "XTBB"; then
   AC_LANG([C++])
 
   TMP_LDFLAGS=${LDFLAGS}
-  # CPPFLAGS="-I${tbb_incdir}"
   LDFLAGS="-L${tbb_libdir} ${TMP_LDFLAGS}"
-  # AC_CHECK_HEADERS([tbb.h], [],AC_MSG_ERROR([tbb.h not found]), [[]])
   AC_CHECK_LIB([tbb], [TBB_runtime_interface_version], [], [AC_MSG_ERROR(["Unable to link with Intel TBB])])
-  # LDFLAGS=${TMP_LDFLAGS}
 
   RTH_CPPFLAGS="-DTHRUST_DEVICE_SYSTEM=THRUST_DEVICE_BACKEND_TBB -I${tbb_incdir}/tbb"
   RTH_LDFLAGS="-L${tbb_libdir}/tbb -ltbb"

@@ -58,7 +58,7 @@ struct dochunk
   }
 };
 
-extern "C" SEXP rthtable(
+extern "C" SEXP c_rthtable(
   SEXP r_x,
   SEXP r_lowerbound,
   SEXP r_upperbound,

@@ -7,7 +7,7 @@
     # cores
 */
 
-extern "C" SEXP Rth_get_backend()
+extern "C" SEXP c_Rth_get_backend()
 {
   SEXP backend;
   PROTECT(backend = allocVector(STRSXP, 1));
@@ -28,7 +28,7 @@ extern "C" SEXP Rth_get_backend()
 
 
 
-extern "C" SEXP Rth_get_num_threads()
+extern "C" SEXP c_Rth_get_num_threads()
 {
   char *rth_nthreads = getenv("RTH_NUM_THREADS");
   char *omp_nthreads = getenv("OMP_NUM_THREADS");

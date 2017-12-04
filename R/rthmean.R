@@ -12,20 +12,20 @@
 #' @author Norm Matloff <matloff@@cs.ucdavis.edu> and Drew Schmidt
 #' <schmidt@@math.utk.edu>
 #' @examples
-#' 
+#'
 #' \dontrun{
 #' x <- c(1:10, 50)
 #' x
 #' rthmean(x)
 #' }
-#' 
+#'
 #' @export
 rthmean <- function(x, nthreads=rth.nthreads())
 {
   if (!is.double(x))
     storage.mode(x) <- "double"
-  
-  ret <- .Call("rthmean", x, as.integer(nthreads), PACKAGE="Rth")
-  
+
+  ret <- .Call(c_rthmean, x, as.integer(nthreads))
+
   return( ret )
 }

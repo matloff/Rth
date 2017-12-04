@@ -18,7 +18,7 @@
 #' order.
 #'
 #' If \code{inplace} is TRUE, there is no return value.
-#' @references \url{https://docs.thrust.googlecode.com/hg/group__sorting.html}
+#' @references \url{http://thrust.github.io/doc/group__sorting.html}
 #' @examples
 #'
 #' \dontrun{
@@ -35,19 +35,16 @@ rthsort <- function(x, decreasing=FALSE, inplace=FALSE, nthreads=rth.nthreads())
 {
   nthreads <- as.integer(nthreads)
 
-  
   if (is.integer(x)) {
-     out <- .Call("rthsort_int", x, as.integer(decreasing),
-               as.integer(inplace), as.integer(nthreads), PACKAGE="Rth")
-  }
-  else
-  {
-    if (!is.double(x))
+     out <- .Call(c_rthsort_int, x, as.integer(decreasing),
+               as.integer(inplace), as.integer(nthreads))
+  } else {
+    if (!is.double(x)) {
       storage.mode(x) <- "double"
-    out <- .Call("rthsort_double", x, as.integer(decreasing),
-              as.integer(inplace), as.integer(nthreads), PACKAGE="Rth")
+    }
+    out <- .Call(c_rthsort_double, x, as.integer(decreasing),
+              as.integer(inplace), as.integer(nthreads))
   }
- 
 
   if (inplace) return(invisible(0)) else return(out)
 }

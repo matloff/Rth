@@ -67,7 +67,7 @@ struct calc_pdist
 
 // for unknown reasons, this code does not work under TBB
 // compute distances from rows of r_x_matrix to rows of r_y_matrix
-extern "C" SEXP rthpdist(SEXP r_x_matrix, SEXP r_y_matrix, SEXP nthreads)
+extern "C" SEXP c_rthpdist(SEXP r_x_matrix, SEXP r_y_matrix, SEXP nthreads)
 {
   SEXP r_out;
   int x_rows = nrows(r_x_matrix);

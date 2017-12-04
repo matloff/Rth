@@ -22,7 +22,7 @@ struct div_by_n
 };
 
 // FIXME very slow
-extern "C" SEXP rthmean(SEXP r_input, SEXP nthreads)
+extern "C" SEXP c_rthmean(SEXP r_input, SEXP nthreads)
 {
   SEXP r_avg;
   PROTECT(r_avg = allocVector(REALSXP, 1));

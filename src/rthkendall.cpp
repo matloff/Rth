@@ -29,7 +29,7 @@ struct calcgti {
     dy(_dy),
     n(_n)
     {
-      wdx = thrust::raw_pointer_cast(&dx[0]);   
+      wdx = thrust::raw_pointer_cast(&dx[0]);
       wdy = thrust::raw_pointer_cast(&dy[0]);
     }
   __device__
@@ -45,26 +45,26 @@ struct calcgti {
 
 
 
-extern "C" SEXP rthkendall(SEXP x, SEXP y, SEXP nthreads)
+extern "C" SEXP c_rthkendall(SEXP x, SEXP y, SEXP nthreads)
 {
   SEXP ret;
   PROTECT(ret = allocVector(REALSXP, 1));
   const int n = LENGTH(x);
-  
+
   RTH_GEN_NTHREADS(nthreads);
-  
+
   thrust::counting_iterator<int> seqa(0);
   thrust::counting_iterator<int> seqb =  seqa + n - 1;
   floublevec dx(REAL(x), REAL(x)+n);
   floublevec dy(REAL(y), REAL(y)+LENGTH(y)); // FIXME this makes me suspicious...
-  
+
   intvec tmp(n-1);
   thrust::transform(seqa, seqb, tmp.begin(), calcgti(dx,dy,n));
   int totcount = thrust::reduce(tmp.begin(), tmp.end());
   flouble npairs = n * (n-1) / 2;
-  
+
   REAL(ret)[0] = (double) (totcount - (npairs-totcount)) / npairs;
-  
+
   return ret;
 }
 

@@ -7,20 +7,20 @@
 # nthreads:  number of threads (OMP, TBB cases)
 
 #' Parallel Computation of Contingency Tables
-#' 
+#'
 #' Similar to R's \code{table}, but with important differences.
-#' 
+#'
 #' The function \code{rthtable()} is similar to R's \code{table()}.  It allows
 #' more cells than \code{table()}, and is much faster.  However, unlike
 #' \code{table()}, here users must specify the ranges of the variables in
 #' advance.
-#' 
+#'
 #' The function \code{arylin2mult()} is handy for tables of high dimension.
 #' For example, one may be interested in searching for outliers, and thus
 #' consider cells of small sizes, say less than 5.  We can apply \code{which()}
 #' to the table, then use \code{arylin2mult()} to convert the resulting linear
 #' indices to multidimensional ones.
-#' 
+#'
 #' @aliases rthtable arylin2mult
 #' @param m Data matrix, one row per observation.
 #' @param lb Vector of lower bounds on the variables.
@@ -33,14 +33,14 @@
 #' @param nch Number of chunks for partitioning the data.
 #' @return The function \code{rthtable()} returns an object of R class
 #' \code{table}.
-#' 
+#'
 #' The function \code{arylin2mult()} returns a matrix of multidimensional
 #' indices, one row for each element of \code{lins}.
 #' @examples
-#' 
+#'
 #' \dontrun{
 #' library(MASS)
-#' pm <- Pima.te  
+#' pm <- Pima.te
 #' # cut diabetic pedigree, age into 3 ranges
 #' pm$ped1 <- cut(pm$ped,3,1:3)
 #' pm$age1 <- cut(pm$age,3,1:3)
@@ -51,14 +51,14 @@
 #'    "senior"),c("no","yes"))
 #' tbl <- rthtable(pm[,9:11],c(1,1,0),c(3,3,1),dnn=dnn)
 #' tbl  # display the table
-#' 
+#'
 #' # which cells are rate (clear visually here, less so with many vars)
 #' tbli <- as.integer(tbl)  # pure cell counts
 #' arylin2mult(which(tbli < 5),c(1,1,0),c(3,3,1))
 #' # e.g. output shows one small cell is (3,1,0), i.e. high risk/young/no
-#' 
+#'
 #' }
-#' 
+#'
 #' @export
 rthtable <- function(m,lb,ub,varnames=NULL,dnn=NULL,
    nthreads=rth.nthreads(),nch=nthreads)
@@ -71,13 +71,13 @@ rthtable <- function(m,lb,ub,varnames=NULL,dnn=NULL,
    if (length(ub) == 1) ub <- rep(ub,nv)
 
    dim <- ub - lb + 1
-   
+
    if (!is.integer(m))
      storage.mode(m) <- "integer"
-   
-   freq <- .Call("rthtable",m,
+
+   freq <- .Call(c_rthtable,m,
       as.integer(lb),as.integer(ub),as.integer(nch),as.integer(nthreads))
-   
+
    # dimension labels
    if (is.null(dnn)) {
       dnn <- list()
@@ -90,14 +90,14 @@ rthtable <- function(m,lb,ub,varnames=NULL,dnn=NULL,
 
    tbl <- array(freq,dim,dimnames=dnn)
    class(tbl) <- "table"
-   
+
    tbl
 }
 
 # converts linear array indices to one for the table output of rthtable;
 # useful e.g. in identifying which cells are extremes
 #
-#   lins:  vector of linear indices of interest 
+#   lins:  vector of linear indices of interest
 #   lb, ub:  as in rthtable(), but must be fully specified, no reliance
 #            on recycling
 #
